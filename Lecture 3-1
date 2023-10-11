@@ -1,0 +1,15 @@
+import 'dart:io';
+void main(){
+  int num;
+	stdout.write("Enter a number: ");
+  num = int.parse(stdin.readLineSync()!);
+  print("The factorial of $num is: ${factorial(num)}");
+}
+
+int factorial(int x){
+  int f = 1;
+  for (int i = 2; i <= x; i++) {
+    f *= i;
+  }
+  return f;
+}
