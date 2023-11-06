@@ -1,0 +1,105 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+class Home extends StatefulWidget {
+  const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+
+  String _text = '';
+  double _x = -1;
+  double _y = -1;
+  int count = 0;
+  String image = 'images/pic1.jpg';
+  List<String> images = [
+    'images/pic1.jpg',
+    'images/pic2.jpg',
+    'images/pic3.jpg',
+    'images/pic4.jpg'
+  ];
+
+  void updateX(String x){
+    if(x.trim() == ''){
+      _x = -1;
+    }else{
+      _x = double.parse(x);
+    }
+  }
+  void updateY(String y){
+    if(y.trim() == ''){
+      _y = -1;
+    }else{
+      _y = double.parse(y);
+    }
+  }
+
+  void updateText(){
+    setState(() {
+      if(_x == -1 || _y == -1){
+        _text = 'please fill all fields';
+      }else {
+        _text = (_x + _y).toString();
+      }
+      count = (count + 1) % images.length;
+      image = images[count];
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          children: [
+            const SizedBox(height: 24.0,),
+            Text("Sum: $_text", style: const TextStyle(fontSize: 18.0),),
+            const SizedBox(height: 24.0,),
+            MyTextField(hint: "Enter X",f: updateX),
+            const SizedBox(height: 24.0,),
+             MyTextField(hint: "Enter Y", f: updateY),
+            const SizedBox(height : 24.0),
+            ElevatedButton(onPressed: updateText,
+                child: const Text('SUM', style: TextStyle(fontSize: 18.0),)
+            ),
+            const SizedBox(height: 15.0,),
+            Image.asset(image, width: 190.0, height: 190.0,),
+          ], // Children of Scaffold column
+        ),
+      ),
+      appBar: AppBar(
+        title: const Text("Home Page"),
+        centerTitle: true,
+        backgroundColor: Colors.teal,
+      ),
+    );
+  }
+}
+
+class MyTextField extends StatelessWidget {
+  const MyTextField({required this.hint, required this.f, super.key});
+  final Function(String) f;
+  final String hint;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        width: 300.0,
+        child : TextField(
+          keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+      ],
+      style: const TextStyle(fontSize: 18.0),
+      onChanged: (text) => f(text),
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(),
+        hintText: hint,
+      ),
+    )
+    );
+  }
+}
