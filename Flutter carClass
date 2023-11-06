@@ -1,0 +1,38 @@
+import 'package:flutter/material.dart';
+
+class Car{
+  String model;
+  int price;
+
+  Car(this.model, this.price);
+
+  @override
+  String toString() {
+    return '$model Price:\$$price';
+  }
+}
+
+List<Car> cars = [
+  Car('Toyota', 10000),
+  Car('Marcedes', 15000),
+  Car('Hyudai', 2000),
+  Car('Honda', 5000),
+];
+
+class CarsWidget extends StatefulWidget {
+  const CarsWidget({super.key});
+
+  @override
+  State<CarsWidget> createState() => _CarsWidgetState();
+}
+
+class _CarsWidgetState extends State<CarsWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return DropdownMenu(
+        dropdownMenuEntries: cars.map((car) {
+          return DropdownMenuEntry(value : car, label : car.toString());
+        }).toList()
+    );
+  }
+}
