@@ -9,10 +9,50 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Car car = cars[0];
+  String result = cars[0].price.toStringAsFixed(0);
+  
+  void updateCar(Car c){
+    setState(() {
+      car = c;
+      result = car.calculateTotalPrice();
+    });
+  }
+
+  void updateWarranty(int years){
+    setState(() {
+      car.years = years;
+      result = car.calculateTotalPrice();
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: CarsWidget(),
+    return Scaffold(
+      body: Center(
+        child: Column(
+          children: [
+            const SizedBox(height: 10.0,),
+            const Text("Select Model"),
+            const SizedBox(height: 10.0,),
+            CarsWidget(update: updateCar,),
+            const SizedBox(height: 10.0,),
+            WarrantyWidget(update: updateWarranty, car: car),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Insurance'),
+                Checkbox(value: car.insurance, onChanged: (e) => setState(() {
+                  car.insurance = e as bool;
+                  result = car.calculateTotalPrice();
+                })),
+              ],
+            ),
+            Text('Total Price: $result', style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10.0,),
+          ],
+        ),
+      ),
     );
   }
 }
