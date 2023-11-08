@@ -3,12 +3,23 @@ import 'package:flutter/material.dart';
 class Car{
   String model;
   int price;
+  int years = 1;
+  bool insurance = false;
 
   Car(this.model, this.price);
 
+  String calculateTotalPrice(){
+    int amount = insurance ? 1000 : 0;
+    if(years == 1){
+      return (price * 1.05 + amount).toStringAsFixed(0);
+    }else{
+      return (price * 1.1 + amount).toStringAsFixed(0);
+    }
+  }
+
   @override
   String toString() {
-    return '$model Price:\$$price';
+    return '$model Price: \$$price';
   }
 }
 
@@ -20,7 +31,9 @@ List<Car> cars = [
 ];
 
 class CarsWidget extends StatefulWidget {
-  const CarsWidget({super.key});
+  const CarsWidget({required this.update, super.key});
+
+  final Function(Car) update;
 
   @override
   State<CarsWidget> createState() => _CarsWidgetState();
@@ -30,9 +43,39 @@ class _CarsWidgetState extends State<CarsWidget> {
   @override
   Widget build(BuildContext context) {
     return DropdownMenu(
+      onSelected: (car) => widget.update(car as Car),
+      initialSelection: cars[0],
         dropdownMenuEntries: cars.map((car) {
           return DropdownMenuEntry(value : car, label : car.toString());
         }).toList()
     );
   }
 }
+
+class WarrantyWidget extends StatefulWidget {
+  const WarrantyWidget({required this.update, required this.car, super.key});
+
+  final Function(int) update;
+  final Car car;
+
+  @override
+  State<WarrantyWidget> createState() => _WarrantyWidgetState();
+}
+
+class _WarrantyWidgetState extends State<WarrantyWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      const Text('Warranty: '),
+      Radio(value: 1,
+          groupValue: widget.car.years,
+          onChanged: (years) => widget.update(years as int)),
+      const Text('1 Year'),
+      Radio(value: 5,
+          groupValue: widget.car.years,
+          onChanged: (years) => widget.update(years as int)),
+      const Text('5 Year'),
+    ],);
+  }
+}
+
