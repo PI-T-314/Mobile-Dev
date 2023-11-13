@@ -1,0 +1,50 @@
+import 'package:flutter/material.dart';
+import 'page2.dart';
+
+class Page1 extends StatefulWidget {
+  const Page1({super.key});
+
+  @override
+  State<Page1> createState() => _Page1State();
+}
+
+class _Page1State extends State<Page1> {
+
+  final TextEditingController _controllerHours = TextEditingController();
+  final TextEditingController _controllerRate = TextEditingController();
+
+  @override
+  void dispose() {
+    _controllerHours.dispose();
+    _controllerRate.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Page 1", style: TextStyle(color: Colors.red),),
+        centerTitle: true,
+        backgroundColor: Colors.black,
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            const SizedBox(height: 10.0,),
+            const SizedBox(width: 200.0,
+              child: TextField() ,)
+            ,ElevatedButton(onPressed: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => Page2())
+              );
+            },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+              child: const Icon(Icons.navigate_next, size: 50.0, color: Colors.red,),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
