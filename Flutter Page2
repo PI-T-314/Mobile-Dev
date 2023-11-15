@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:week7_b/employee.dart';
 import 'page1.dart';
 
 class Page2 extends StatelessWidget {
-  Page2({super.key});
+  const Page2({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final employee = ModalRoute.of(context)!.settings.arguments as Employee;
     return Scaffold(
       appBar: AppBar(
         title: const Text("Page 2", style: TextStyle(color: Colors.red),),
@@ -15,6 +17,8 @@ class Page2 extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
+            const SizedBox(height: 10.0,),
+            Text(employee.toString(), style: const TextStyle(fontSize: 24.0, color: Colors.teal),),
             const SizedBox(height: 10.0,),
             ElevatedButton(onPressed: () {
               Navigator.of(context).pop();
