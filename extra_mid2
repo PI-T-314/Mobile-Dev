@@ -1,0 +1,48 @@
+import 'package:extra/student.dart';
+import 'package:flutter/material.dart';
+import 'grade.dart';
+
+class Home extends StatefulWidget {
+  const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title:const Text("Midterm Exam YR", style: TextStyle(color: Colors.white),),
+        backgroundColor: Colors.purple,
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            const SizedBox(height: 15,),
+            const Text('Select a student to enter his grade'),
+            const SizedBox(height: 15,),
+            Expanded(
+              child: ListView.builder(
+              itemCount: students.length,
+              itemBuilder: ((context, index) {
+                return Column(
+                  children: [
+                    const SizedBox(height: 20,),
+                    TextButton(onPressed: (){
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => const GradeActivity(),
+                        settings: RouteSettings(arguments: students[index].name)),
+                      );
+                    }, child: Text(students[index].toString()))
+                  ],
+                );
+              }),
+            )
+              )
+          ]),
+      ),
+    );
+  }
+}
