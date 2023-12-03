@@ -1,0 +1,76 @@
+import 'package:flutter/material.dart';
+
+class GradeActivity extends StatefulWidget {
+  const GradeActivity({super.key});
+
+  @override
+  State<GradeActivity> createState() => _GradeActivityState();
+}
+
+class _GradeActivityState extends State<GradeActivity> {
+
+  String img = 'https://images.unsplash.com/photo-1592188657297-c6473609e988?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8c3R1ZGVudHxlbnwwfHwwfHx8MA%3D%3D';
+  double grade1 = -1;
+  double grade2 = -1;
+
+  void checkResult(){
+    setState(() {
+      double average = (grade1 * 0.4) + (grade2 * 0.6);
+      if(grade1 == -1 || grade2 == -1){
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please Fill All Grades")));
+      }else{
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Grade: $average')));
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final name = ModalRoute.of(context)!.settings.arguments as String;
+    return Scaffold(
+      appBar: AppBar(
+        title:const Text("Midterm Exam YR", style: TextStyle(color: Colors.white),),
+        backgroundColor: Colors.purple,
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Image.network(img, width: 150, height: 100, fit: BoxFit.fill,),
+                const SizedBox(width: 30,),
+                Text(name),
+              ],),
+              const SizedBox(height: 15,),
+              const Text("Enter Grade: "),
+              SizedBox(
+                width: 300,
+                child: TextField(
+                  onChanged: (text) {
+                    setState(() {
+                      grade1 = double.parse(text);
+                    });
+                  },
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(border: OutlineInputBorder(), hintText: "Enter Midterm"),
+                ),),
+                const SizedBox(height: 15,),
+                SizedBox(
+                width: 300,
+                child: TextField(
+                   onChanged: (text) {
+                    setState(() {
+                      grade2 = double.parse(text);
+                    });
+                  },
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(border: OutlineInputBorder(), hintText: "Enter Final"),
+                ),),
+                const SizedBox(height: 15,),
+                ElevatedButton(onPressed: checkResult, 
+                style:ElevatedButton.styleFrom(backgroundColor: Colors.purple, foregroundColor: Colors.white), 
+                child: const Text("Enter Grades"))
+        ],)),
+    );
+  }
+}
