@@ -1,0 +1,18 @@
+import 'package:flutter/material.dart';
+
+class CarImage extends StatelessWidget {
+  const CarImage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    String image = ModalRoute.of(context)!.settings.arguments.toString();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Car Image", style: TextStyle(color: Colors.white),),
+        centerTitle: true,
+        backgroundColor: Colors.blueAccent,
+      ),
+      body: Image.network(image, width: MediaQuery.of(context).size.width, height: MediaQuery.of(context).size.height,),
+    );
+  }
+}
