@@ -1,0 +1,49 @@
+import 'package:flutter/material.dart';
+import 'package:sample/car.dart';
+import 'car_image.dart';
+
+class Home extends StatefulWidget {
+  const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+
+  String result = 'Available Cars';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(result, style: const TextStyle(color: Colors.white),),
+        centerTitle: true,
+        backgroundColor: Colors.blueAccent,
+      ),
+      body: ListView.builder(
+        itemCount: cars.length,
+        itemBuilder: (context, index) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: ((context) => const CarImage()),
+                  settings: RouteSettings(arguments: cars[index].image)
+                ));
+              }, icon: const Icon(Icons.search)),
+              IconButton(onPressed: () {
+                setState(() {
+                  result = 'Model: ${cars[index].model} Price: \$${cars[index].rentPerDay}';
+                });
+                
+              }, icon: const Icon(Icons.library_books)),
+              Text(cars[index].toString()),
+            ],
+          );
+        },
+      )
+      );
+  }
+}
