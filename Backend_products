@@ -1,0 +1,46 @@
+import 'package:http/http.dart' as http; //methods tha gets data from the internet (user flutter pub add http)
+import 'dart:convert' as convert; // turns json data to dart objects
+
+const String baseURL = 'mobileweek1023.000webhostapp.com/getProducts.php';
+
+List<Product> _products = [];
+
+//remember cache and caching in next project
+
+class Product{
+  int _pid;
+  String _name;
+  int _quantity;
+  double _price;
+  String _category;
+
+  Product(this._pid, this._name, this._quantity, this._price, this._category);
+
+  @override
+  String toString(){
+    return "Pid: $_pid, Name: $_name\nQuantity: $_quantity, Price: $_price\nCategory: $_category";
+  }
+}
+
+void updateProducts(Function(bool success) update) async{
+  try{
+    var url = Uri.https(baseURL, 'getProducts.php');
+    var response = await http.get(url).timeout(const Duration(seconds: 5));
+    if(response.statusCode == 200){
+      _products.clear();
+      var data = convert.jsonDecode(response.body);
+      for(var row in data){
+        int pid = int.parse(row['pid']);
+        String name = row['name'];
+        int quantity = int.parse(row['quantity']);
+        double price = double.parse(row['price']);
+        String category = row['category'];
+        _products.add(Product(pid, name, quantity, price, category));
+      }
+    }else{
+      update(false);
+    }
+  }catch(e){
+    update(false);
+  }
+}
