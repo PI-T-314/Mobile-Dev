@@ -1,13 +1,9 @@
-import 'package:http/http.dart'
-    as http; //methods tha gets data from the internet (user flutter pub add http)
-import 'dart:convert' as convert; // turns json data to dart objects
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 
-const String baseURL = 'http://mobileweek1023.000webhostapp.com/';
-
+const String baseUrl = 'mobileWeek1023.000webhostapp.com';
 List<Product> _products = [];
-
-//remember cache and caching in next project
 
 class Product {
   int _pid;
@@ -20,17 +16,22 @@ class Product {
 
   @override
   String toString() {
-    return "Pid: $_pid, Name: $_name\nQuantity: $_quantity, Price: $_price\nCategory: $_category";
+    return 'PID:$_pid Name:$_name\nQuantity:$_quantity Price:\$$_price\nCategory:$_category';
   }
 }
 
 void updateProducts(Function(bool success) update) async {
+  // similar to thread kormal main thread ma tsewe block laan bada wa2t
   try {
-    var url = Uri.https(baseURL, 'getProducts.php');
-    var response = await http.get(url).timeout(const Duration(seconds: 5));
+    var url = Uri.https(baseUrl, 'getProducts.php'); //option we can use map
+    var response = await http.get(url).timeout(const Duration(
+        seconds: 5)); // await mitl join behal eta5ar 3n 5 beseer exception
+
     if (response.statusCode == 200) {
       _products.clear();
-      var data = convert.jsonDecode(response.body);
+
+      var data = convert.jsonDecode(response
+          .body); // heye ljason array mn objects as (String) nehna hown bl convert hawlneha la list of map rj3na sawyna loop w 3mlna var row w heda row la kill object as String
       for (var row in data) {
         int pid = int.parse(row['pid']);
         String name = row['name'];
@@ -38,6 +39,7 @@ void updateProducts(Function(bool success) update) async {
         double price = double.parse(row['price']);
         String category = row['category'];
         _products.add(Product(pid, name, quantity, price, category));
+        
       }
       update(true);
     } else {
@@ -57,26 +59,20 @@ class ShowProducts extends StatelessWidget {
         itemCount: _products.length,
         itemBuilder: (context, index) => Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Container(
-                      color: index % 2 == 0 ? Colors.teal : Colors.blueGrey,
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Flexible(
-                                child: Text(
-                              _products[index].toString(),
-                              style: const TextStyle(color: Colors.black),
-                            ))
-                          ]),
-                    )
-                  ],
-                )
+                Container(
+                  width: 200,
+                  color: index % 2 == 0 ? Colors.cyan : Colors.amber,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _products[index].toString(),
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 5),
               ],
             ));
   }
