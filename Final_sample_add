@@ -1,0 +1,150 @@
+import 'package:flutter/material.dart';
+import 'show_customers.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
+
+String baseUrl = 'csci410fall2023.000webhostapp.com';
+bool loading = false;
+
+class Customer{
+
+  int cid;
+  String name;
+  double balance;
+
+  Customer(this.cid, this.name, this.balance);
+
+  @override
+  String toString(){
+    return "Cid: $cid, Name: $name, balance: $balance";
+  }
+
+}
+
+class AddCustomer extends StatefulWidget {
+  const AddCustomer({super.key});
+
+  @override
+  State<AddCustomer> createState() => _AddCustomerState();
+}
+
+class _AddCustomerState extends State<AddCustomer> {
+  @override
+
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  TextEditingController _controllerId = TextEditingController();
+  TextEditingController _controllerName = TextEditingController();
+  TextEditingController _controllerBalance = TextEditingController();
+
+  @override
+  void dispose(){
+    super.dispose();
+    _controllerId.dispose();
+    _controllerName.dispose();
+    _controllerBalance.dispose();
+  }
+
+  void showResult(String msg){
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    setState(() {
+      loading = false;
+    });
+  }
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Add Customer", style: TextStyle(color: Colors.white),),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            const SizedBox(height: 10,),
+            Form(
+              key: _formkey,
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: 300,
+                    child: TextFormField(
+                      controller: _controllerId,
+                      validator: (value)=>((value==null || value.isEmpty)? 'Please Enter Id':null),
+                      decoration: const InputDecoration(hintText: 'Enter ID', border: OutlineInputBorder()),
+                    ),
+                  ),
+                  const SizedBox(height: 10,),
+                  SizedBox(
+                    width: 300,
+                    child: TextFormField(
+                      controller: _controllerName,
+                      validator: (value)=>((value==null || value.isEmpty)? 'Please Enter Name':null),
+                      decoration: const InputDecoration(hintText: 'Enter Name', border: OutlineInputBorder()),
+                    ),
+                  ),
+                  const SizedBox(height: 10,),
+                  SizedBox(
+                    width: 300,
+                    child: TextFormField(
+                      controller: _controllerBalance,
+                      validator: (value)=>((value==null || value.isEmpty)? 'Please Enter Balance':null),
+                      decoration: const InputDecoration(hintText: 'Enter Balance', border: OutlineInputBorder()),
+                    ),
+                  ),
+                  const SizedBox(height: 15,),
+                  ElevatedButton(onPressed: loading ? null :(){
+                    if(_formkey.currentState!.validate()){
+                      setState(() {
+                        loading = true;
+                      });
+                      saveCustomer(showResult , int.parse(_controllerId.text), _controllerName.text, double.parse(_controllerBalance.text));
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue
+                  ),
+                  child: const Text("Submit", style: TextStyle(color: Colors.white),)),
+                  const SizedBox(height: 20,),
+                  ElevatedButton(onPressed: (){
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const ShowCutomers(),)
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue
+                  ),
+                  child: const Text("Show Customers", style: TextStyle(color: Colors.white),)),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+void saveCustomer(Function(String) showResult, int cid, String name, double balance) async{
+  try{
+
+  Map<String, String> data = {
+      'cid' : '$cid',
+      'name' : name,
+      'balance' : '$balance',
+      'key' : 'your_key'
+    };
+
+    var url = Uri.https(baseUrl, 'saveCustomer.php');
+    var response = await http.post(url, body: convert.jsonEncode(data)).timeout(const Duration(seconds: 5));
+
+
+    if(response.statusCode == 200){
+      showResult(response.body);
+    }
+  }catch(e){
+    showResult('Connection Error');
+  }
+}
+
+
