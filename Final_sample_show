@@ -1,0 +1,96 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
+import 'add_customer.dart';
+
+String baseUrl = 'csci410fall2023.000webhostapp.com';
+List<Customer> _customers = [];
+bool loaded = false;
+
+class ShowCutomers extends StatefulWidget {
+  const ShowCutomers({super.key});
+
+  @override
+  State<ShowCutomers> createState() => _ShowCutomersState();
+}
+
+class _ShowCutomersState extends State<ShowCutomers> {
+
+  void update(bool success){
+    if(success){
+      setState(() {
+        loaded = true;
+      });
+    }else{
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Error")));
+    }
+  }
+
+  @override
+  void initState() {
+    showCustomers(update);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Available Customers"),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
+      ),
+      body: loaded ? const CustomerList() : const CircularProgressIndicator()
+    );
+  }
+}
+
+void showCustomers(Function(bool) update) async{
+  try{
+    var url = Uri.https(baseUrl, 'getCustomers.php');
+    var response = await http.get(url).timeout(const Duration(seconds: 5));
+
+    if(response.statusCode == 200){
+      _customers.clear();
+      var data = convert.jsonDecode(response.body);
+
+      for(var row in data){
+        int cid = int.parse(row['cid']);
+        String name = row['name'];
+        double balance = double.parse(row['balance']);
+        _customers.add(Customer(cid, name, balance));
+      }
+      update(true);
+    }else{
+      update(false);
+    }
+  }catch(e){
+      update(false);
+  }
+}
+
+class CustomerList extends StatelessWidget {
+  const CustomerList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: _customers.length,
+      itemBuilder: (context, index) => 
+        Center(
+          child: Column(
+            children: [
+              Container(
+                width: 600,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 10,),
+                    Text(_customers[index].toString()),
+                  ],
+                ),
+              )
+            ]),
+        )
+      ,);
+  }
+}
