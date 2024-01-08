@@ -1,0 +1,180 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
+
+bool loading = false;
+String baseUrl = 'unimobile.000webhostapp.com';
+
+class Client {
+  String name;
+  int age;
+  String gender;
+  String email;
+
+  Client(this.name, this.age, this.gender, this.email);
+
+  @override
+  String toString() {
+    return """
+      Name: $name
+      Age: $age
+      Gender: $gender
+      Email: $email
+    """;
+  }
+}
+
+class AddClient extends StatefulWidget {
+  const AddClient({super.key});
+
+  @override
+  State<AddClient> createState() => _AddClientState();
+}
+
+class _AddClientState extends State<AddClient> {
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  TextEditingController _controllerAge = TextEditingController();
+  TextEditingController _controllerName = TextEditingController();
+  TextEditingController _controllerGender = TextEditingController();
+  TextEditingController _controllerEmail = TextEditingController();
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controllerAge.dispose();
+    _controllerGender.dispose();
+    _controllerName.dispose();
+    _controllerEmail.dispose();
+  }
+
+   void showResult(String msg){
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    setState(() {
+      loading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Client Management"),
+      ),
+      body: Column(
+        children: [
+          const SizedBox(
+            height: 10,
+          ),
+          const Text(
+            "Add a Client",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Form(
+              key: _formkey,
+              child: Column(children: [
+                SizedBox(
+                  width: 300,
+                  child: TextFormField(
+                    controller: _controllerName,
+                    validator: (value) => ((value == null || value.isEmpty)
+                        ? 'Please Enter Name'
+                        : null),
+                    decoration: const InputDecoration(
+                        hintText: 'Enter Name', border: OutlineInputBorder()),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                SizedBox(
+                  width: 300,
+                  child: TextFormField(
+                    controller: _controllerAge,
+                    validator: (value) => ((value == null || value.isEmpty)
+                        ? 'Please Enter Age'
+                        : null),
+                    decoration: const InputDecoration(
+                        hintText: 'Enter Age', border: OutlineInputBorder()),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                SizedBox(
+                  width: 300,
+                  child: TextFormField(
+                    controller: _controllerGender,
+                    validator: (value) => ((value == null || value.isEmpty)
+                        ? 'Please Enter Gender'
+                        : null),
+                    decoration: const InputDecoration(
+                        hintText: 'Enter Gender', border: OutlineInputBorder()),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                SizedBox(
+                  width: 300,
+                  child: TextFormField(
+                    controller: _controllerEmail,
+                    validator: (value) => ((value == null || value.isEmpty)
+                        ? 'Please Enter Email'
+                        : null),
+                    decoration: const InputDecoration(
+                        hintText: 'Enter Email', border: OutlineInputBorder()),
+                  ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                ElevatedButton(
+                    onPressed: loading
+                        ? null
+                        : () {
+                            if (_formkey.currentState!.validate()) {
+                              setState(() {
+                                loading = true;
+                              });
+                              saveClient(showResult, _controllerName.text, int.parse(_controllerAge.text), _controllerGender.text, _controllerEmail.text);
+                            }
+                          },
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                    child: const Text(
+                      "Submit",
+                      style: TextStyle(color: Colors.white),
+                    )),
+                const SizedBox(
+                  height: 20,
+                ),
+              ])),
+        ],
+      ),
+    );
+  }
+}
+
+void saveClient(Function(String) showResult, String name, int age,
+    String gender, String email) async {
+  try {
+    Map<String, String> data = {
+      'name': name,
+      'age': '$age',
+      'gender': gender,
+      'email': email,
+      'key': 'liuFinal',
+    };
+
+    var url = Uri.https(baseUrl, 'addClient.php');
+    var response = await http
+        .post(url, body: convert.jsonEncode(data))
+        .timeout(const Duration(seconds: 5));
+
+    if (response.statusCode == 200) {
+      showResult(response.body);
+    }
+  } catch (e) {
+    showResult('Connection Error');
+  }
+}
