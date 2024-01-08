@@ -1,0 +1,98 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
+import 'add_client.dart';
+
+String baseUrl = 'unimobile.000webhostapp.com';
+bool loaded = false;
+List<Client> _clients = [];
+
+class ShowOldRes extends StatefulWidget {
+  const ShowOldRes({super.key});
+
+  @override
+  State<ShowOldRes> createState() => _ShowOldResState();
+}
+
+class _ShowOldResState extends State<ShowOldRes> {
+  void update(bool success) {
+    if (success) {
+      setState(() {
+        loaded = true;
+      });
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Error")));
+    }
+  }
+
+  @override
+  void initState() {
+    showOldClients(update);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("Available Customers"),
+          centerTitle: true,
+          backgroundColor: Colors.blue,
+        ),
+        body: loaded ? const ShowOld() : const CircularProgressIndicator());
+  }
+}
+
+void showOldClients(Function(bool) update) async {
+  try {
+    var url = Uri.https(baseUrl, 'getClients.php');
+    var response = await http.get(url).timeout(const Duration(seconds: 5));
+
+    if (response.statusCode == 200) {
+      _clients.clear();
+      var data = convert.jsonDecode(response.body);
+
+      for (var row in data) {
+        if (int.parse(row['age']) > 30) {
+          String name = row['name'];
+          int age = int.parse(row['age']);
+          String gender = row['gender'];
+          String email = row['email'];
+          _clients.add(Client(name, age, gender, email));
+        }
+      }
+      update(true);
+    } else {
+      update(false);
+    }
+  } catch (e) {
+    update(false);
+  }
+}
+
+class ShowOld extends StatelessWidget {
+  const ShowOld({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: _clients.length,
+      itemBuilder: (context, index) => 
+        Center(
+          child: Column(
+            children: [
+              Container(
+                width: 600,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 10,),
+                    Text(_clients[index].toString()),
+                  ],
+                ),
+              )
+            ]),
+        )
+      ,);
+  }
+}
