@@ -1,0 +1,53 @@
+import 'package:flutter/material.dart';
+import 'package:saja_sample/add_client.dart';
+import 'showCustomers.dart';
+import 'show_wmn.dart';
+
+class Home extends StatefulWidget {
+  const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 15,
+            ),
+            Image.network(
+                "https://www.agilitypr.com/wp-content/uploads/2020/08/client-1.jpg"),
+            const SizedBox(
+              height: 25,
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const AddClient(),
+                  ));
+                },
+                child: const Text("Add Client")),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ShowOldRes(),
+                  ));
+                },
+                child: const Text("View Clients With Age > 25")),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ShowWomenRes(),
+                  ));
+                }, child: const Text("Show Female Clients")),
+          ],
+        ),
+      ),
+    );
+  }
+}
